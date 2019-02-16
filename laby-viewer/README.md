@@ -11,7 +11,7 @@ Tile:
 ## Usage
 
 ```
-cargo run
+cargo run DIG-PART.DA1 DIG-LABY.40
 ```
 
 ## Research

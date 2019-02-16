@@ -70,11 +70,12 @@ fn get_laby_from_file(file: String, initial_seek: u64, amount: i32) -> Vec<u8> {
     file.seek(SeekFrom::Start(initial_seek));
 
     for _i in 0..amount {
-        let mut buffer = vec![0u8; 1];
+        let mut buffer = vec![0u8; 2];
         file.read(&mut buffer);
-        laby.push(buffer[0]);
-        // step over the next byte
-        file.seek(SeekFrom::Current(1)).unwrap();
+        // show only tiles for 00 block
+        if(buffer[1] == 0) {
+            laby.push(buffer[0]);
+        }
     }
 
     return laby;
@@ -108,39 +109,12 @@ fn draw_tiles(canvas: &mut sdl2::render::Canvas<sdl2::video::Window>, canvas_wid
     canvas.present();
 }
 
-fn draw_pixels(canvas: &mut sdl2::render::Canvas<sdl2::video::Window>, pixels: Vec<u8>, sprite_size: i32, canvas_width: i32, canvas_height: i32,
-               palette: [(u8, u8, u8); 256]) {
-    let mut i = 0;
-    let pixel_size: u32 = 1;
-
-    for blocky in 0..(canvas_height/(sprite_size * pixel_size as i32)) {
-        for blockx in 0..(canvas_width/(sprite_size * pixel_size as i32)) {
-            for y in 0..sprite_size {
-                for x in 0..sprite_size {
-                    if i < pixels.len() {
-                        let pixel = pixels[i as usize];
-                        let posx = x * pixel_size as i32 + (blockx*sprite_size*pixel_size as i32);
-                        let posy = y * pixel_size as i32 + (blocky*sprite_size*pixel_size as i32);
-                        let (r, g, b) = palette[pixel as usize];
-                        if blocky == 0 && blockx == 0 {
-                            println!("{} {} #{}: {} {} {}", y, x, pixel, r, g, b)
-                        }
-                        canvas.set_draw_color(Color::RGB(r, g, b));
-                        canvas.fill_rect(Rect::new(posx, posy, pixel_size, pixel_size));
-                        i += 1;
-                    }
-                }
-            }
-        }
-    }
-
-    canvas.present();
-}
-
 fn main() {
     let args: Vec<_> = env::args().collect();
 
     let file = String::from("DIG-PART.DA1");
+    let tile_file = &args[1];
+    let laby_file = &args[2];
     let sprite_size: i32 = 16;
     let initial_seek: u64 = 2882;
 
@@ -154,9 +128,8 @@ fn main() {
     let mut canvas = window.into_canvas().software().build().unwrap();
 
     let pixel_size: i32 = 1;
-    // let amount = (800/pixel_size) * (600/pixel_size);
     
-    let tiles = get_tiles_from_file(file.to_string(), initial_seek, 231);
+    let tiles = get_tiles_from_file(tile_file.to_string(), initial_seek, 231);
 
     let canvas_width: i32 = 1200;
     let canvas_height: i32 = 800;
@@ -420,7 +393,6 @@ fn main() {
         (255, 0, 0),
     ];
 
-    let laby_file = String::from("DIG-LABY.40");
     let laby = get_laby_from_file(laby_file.to_string(), 0, 3390);
 
     draw_tiles(&mut canvas, canvas_width, canvas_height, palette, tiles, laby);
