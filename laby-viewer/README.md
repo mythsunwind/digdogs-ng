@@ -19,7 +19,9 @@ cargo run DIG-PART.DA1 DIG-LABY.40
 DIG-LABY.10 = Anfang?
 
 DIG-LABY.11-15 = 5
+
 DIG-LABY.21-26 = 6
+
 DIG-LABY.31-38 = 8 (Längste Strecke = erste Abbiegung?)
 
 DIG-LABY.40 = Ende?
