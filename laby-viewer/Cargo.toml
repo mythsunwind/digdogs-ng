@@ -1,0 +1,15 @@
+[package]
+name = "digdogs-dat-viewer"
+version = "0.1.0"
+authors = ["mythsunwind <cooper@defector.de>"]
+edition = "2018"
+
+[dependencies]
+byteorder = "1.2.7"
+
+[dependencies.sdl2]
+version = "0.32.1"
+default-features = false
+features = ["image"]
+
+

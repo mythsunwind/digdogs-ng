@@ -1,0 +1,14 @@
+[package]
+name    = "digdogs-dumper"
+version = "0.0.1"
+authors = [ "Cooper <cooper@x2>" ]
+
+description = "Dumps files from DIGDOGS"
+
+[dependencies]
+byteorder = "1.2.7"
+
+[dependencies.sdl2]
+version = "0.32"
+default-features = false
+features = ["image"]
