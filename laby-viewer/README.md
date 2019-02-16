@@ -31,16 +31,18 @@ Macht in Tiles je 16x16: 20x10
 
 DIG-LABY.40 enthält keine Tiles aus dem 02 und 03 Block. Daher kann man davon ausgehen, dass es DA1 benutzt.
 
-b6 Oberseite Ortsausgangsschild
-c8 Unterseite Ortsausgangsschild
+b6 = Oberseite Ortsausgangsschild
 
-ad Oberseite Andreaskreuz
-bf Unterseite Andreaskreuz
+c8 = Unterseite Ortsausgangsschild
 
-Parkplatz
+ad = Oberseite Andreaskreuz
 
+bf = Unterseite Andreaskreuz
 
+### Parkplatz
+
+```
 3e 3f 40 41
 56 57 58 59
 64 65 66 67
-
+```

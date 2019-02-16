@@ -43,7 +43,10 @@ Danach: 231? Stück 16x16 Tiles
 ## Beispieladdressierung
 
 c600 Abbiegen Schild
+
 d100 30 Schild
+
 cd00 Baustellen Schild
+
 d000 30 aufgehoben Schild
 
