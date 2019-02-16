@@ -1,6 +1,12 @@
 dat-viewer
 ==========
 
+## Usage
+
+```
+cargo run DIG-PART.DAT 16 `echo 2882+256*25*0+256*0|bc`
+```
+
 ### DIG-PART.DAT
 
 2 bytes = Dateikennung (b503)

@@ -8,6 +8,12 @@ Tile:
 2. Load DA1 file as 2 bytes each
 3. Draw 10 tiles in each column
 
+## Usage
+
+```
+cargo run
+```
+
 ## Research
 
 DIG-LABY.10 = Anfang?
