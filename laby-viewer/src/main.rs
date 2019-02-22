@@ -18,7 +18,7 @@ struct Tile {
     pixels: Vec<u8>,
 }
 
-fn get_tiles_from_file(file: String, initial_seek: u64, amount: i32) -> HashMap<i32, Tile> {
+fn get_tiles_from_file(file: String, initial_seek: u64) -> HashMap<i32, Tile> {
 
     let path = Path::new(&file);
     let mut tiles = HashMap::new();
@@ -35,27 +35,39 @@ fn get_tiles_from_file(file: String, initial_seek: u64, amount: i32) -> HashMap<
 
     file.seek(SeekFrom::Start(initial_seek));
 
-    for id in 0..amount {
+    let mut id = 0;
+    loop {
+        let mut buffer = vec![0; 256];
         let mut pixels: Vec<u8> = Vec::new();
-        for x in 0..256 {
-            let mut buffer = vec![0u8; 1];
-            file.read(&mut buffer);
-            pixels.push(buffer[0]);
-        }
-        let tile = Tile {
-            pixels: pixels,
+        match file.read(&mut buffer) {
+            Err(e) => {
+                panic!("Error reading from file {}: {}", path.display(), e);
+            },
+            Ok(buffer_length) => {
+                if(buffer_length == 0) {
+                    break;
+                } else {
+                    for i in 0..buffer_length {
+                        pixels.push(buffer[i]);
+                    }
+                    let tile = Tile {
+                        pixels: pixels,
+                    };
+                    tiles.insert(id, tile);
+                    id+=1;
+                }
+            },
         };
-        tiles.insert(id, tile);
-
     }
+    println!("{} tiles loaded.", id);
 
     return tiles;
 }
 
-fn get_laby_from_file(file: String, initial_seek: u64, amount: i32) -> Vec<u8> {
+fn get_laby_from_file(file: String, initial_seek: u64, amount: i32) -> Vec<u16> {
 
     let path = Path::new(&file);
-    let mut laby: Vec<u8> = Vec::new();
+    let mut laby: Vec<u16> = Vec::new();
 
     let mut file = match File::open(&path) {
         Err(why) => panic!("Could not open {}: {}",
@@ -74,14 +86,20 @@ fn get_laby_from_file(file: String, initial_seek: u64, amount: i32) -> Vec<u8> {
         file.read(&mut buffer);
         // show only tiles for 00 block
         if(buffer[1] == 0) {
-            laby.push(buffer[0]);
+            laby.push(buffer[0] as u16);
+        } else if(buffer[1] == 1) {
+            laby.push((buffer[0] as u16) + 256);
+        } else if(buffer[1] == 2) {
+            laby.push((buffer[0] as u16) + 512);
+        } else if(buffer[1] == 3) {
+            laby.push((buffer[0] as u16) + 768);
         }
     }
 
     return laby;
 }
 
-fn draw_tiles(canvas: &mut sdl2::render::Canvas<sdl2::video::Window>, canvas_width: i32, canvas_height: i32, palette: [(u8, u8, u8); 256], tiles: HashMap<i32, Tile>, laby: Vec<u8>) {
+fn draw_tiles(canvas: &mut sdl2::render::Canvas<sdl2::video::Window>, canvas_width: i32, canvas_height: i32, palette: [(u8, u8, u8); 256], tiles: HashMap<i32, Tile>, laby: Vec<u16>) {
     for i in 0..laby.len() {
         //let tile = tiles.get(&(laby[i] as i32));
         let tile = match tiles.get(&(laby[i] as i32)) {
@@ -91,10 +109,11 @@ fn draw_tiles(canvas: &mut sdl2::render::Canvas<sdl2::video::Window>, canvas_wid
                 continue;
             },
         };
-        println!("{}: 0x{:02x} {}", i, laby[i], laby[i]);
+        //println!("{}: 0x{:02x} {}", i, laby[i], laby[i]);
         let mut pos = 0;
         let row = i*16/canvas_width as usize;
-        println!("row: {}", row);
+        //println!("row: {}", row);
+        //println!("Drawing tile {}", laby[i]);
         for y in 0..16 {
             for x in 0..16 {
                 let color = tile.pixels[pos];
@@ -129,7 +148,7 @@ fn main() {
 
     let pixel_size: i32 = 1;
     
-    let tiles = get_tiles_from_file(tile_file.to_string(), initial_seek, 231);
+    let tiles = get_tiles_from_file(tile_file.to_string(), initial_seek);
 
     let canvas_width: i32 = 1200;
     let canvas_height: i32 = 800;
