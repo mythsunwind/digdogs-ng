@@ -99,6 +99,8 @@ fn get_laby_from_file(file: String, initial_seek: u64) -> Vec<u16> {
                         laby.push((buffer[0] as u16) + 512);
                     } else if(buffer[1] == 3) {
                         laby.push((buffer[0] as u16) + 768);
+                    } else {
+                        laby.push(19999);
                     }
                 }
             },
