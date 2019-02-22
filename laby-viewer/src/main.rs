@@ -64,7 +64,7 @@ fn get_tiles_from_file(file: String, initial_seek: u64) -> HashMap<i32, Tile> {
     return tiles;
 }
 
-fn get_laby_from_file(file: String, initial_seek: u64, amount: i32) -> Vec<u16> {
+fn get_laby_from_file(file: String, initial_seek: u64) -> Vec<u16> {
 
     let path = Path::new(&file);
     let mut laby: Vec<u16> = Vec::new();
@@ -81,19 +81,28 @@ fn get_laby_from_file(file: String, initial_seek: u64, amount: i32) -> Vec<u16> 
 
     file.seek(SeekFrom::Start(initial_seek));
 
-    for _i in 0..amount {
+    loop {
         let mut buffer = vec![0u8; 2];
-        file.read(&mut buffer);
-        // show only tiles for 00 block
-        if(buffer[1] == 0) {
-            laby.push(buffer[0] as u16);
-        } else if(buffer[1] == 1) {
-            laby.push((buffer[0] as u16) + 256);
-        } else if(buffer[1] == 2) {
-            laby.push((buffer[0] as u16) + 512);
-        } else if(buffer[1] == 3) {
-            laby.push((buffer[0] as u16) + 768);
-        }
+        match file.read(&mut buffer) {
+            Err(e) => {
+                panic!("Error reading from file {}: {}", path.display(), e);
+            },
+            Ok(buffer_length) => {
+                if(buffer_length == 0) {
+                    break;
+                } else {
+                    if(buffer[1] == 0) {
+                        laby.push(buffer[0] as u16);
+                    } else if(buffer[1] == 1) {
+                        laby.push((buffer[0] as u16) + 256);
+                    } else if(buffer[1] == 2) {
+                        laby.push((buffer[0] as u16) + 512);
+                    } else if(buffer[1] == 3) {
+                        laby.push((buffer[0] as u16) + 768);
+                    }
+                }
+            },
+        };
     }
 
     return laby;
@@ -412,7 +421,7 @@ fn main() {
         (255, 0, 0),
     ];
 
-    let laby = get_laby_from_file(laby_file.to_string(), 0, 3390);
+    let laby = get_laby_from_file(laby_file.to_string(), 0);
 
     draw_tiles(&mut canvas, canvas_width, canvas_height, palette, tiles, laby);
 
