@@ -111,17 +111,30 @@ fn get_laby_from_file(file: String, initial_seek: u64) -> Vec<u16> {
 }
 
 fn draw_tiles(canvas: &mut sdl2::render::Canvas<sdl2::video::Window>, canvas_width: i32, canvas_height: i32, palette: [(u8, u8, u8); 256], tiles: HashMap<i32, Tile>, laby: Vec<u16>) {
-    for i in 0..laby.len() {
-        let row = i*16 / canvas_width as usize * 16;
-        let col = i*16 % canvas_width as usize;
-        let tile = match tiles.get(&(laby[i] as i32)) {
-            Some(tile) => tile,
-            None => {
-                println!("No tile with number: {}", laby[i]);
-                continue;
-            },
-        };
-        draw_tile(canvas, palette, tile, col as i32, row as i32);
+    let tiles_per_row = canvas_width / 16;
+    let tiles_per_col = 10;
+    let mut i = 0;
+    let mut pixels: Vec<u8> = Vec::new();
+    for i in 0..16*16 {
+        pixels.push(255);
+    }
+    let blank_tile = Tile {
+        pixels: pixels,
+    };
+
+    for col in (0..tiles_per_row).rev() {
+        for row in 0..tiles_per_col {
+            println!("Draw row {} col {}", row, col);
+            let tile = match tiles.get(&(laby[i] as i32)) {
+                Some(tile) => tile,
+                None => {
+                    println!("No tile with number: {}", laby[i]);
+                    &blank_tile
+                },
+            };
+            draw_tile(canvas, palette, tile, col*16 as i32, row*16 as i32);
+            i+=1;
+        }
     }
     canvas.present();
 }
