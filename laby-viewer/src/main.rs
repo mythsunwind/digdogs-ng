@@ -112,7 +112,8 @@ fn get_laby_from_file(file: String, initial_seek: u64) -> Vec<u16> {
 
 fn draw_tiles(canvas: &mut sdl2::render::Canvas<sdl2::video::Window>, canvas_width: i32, canvas_height: i32, palette: [(u8, u8, u8); 256], tiles: HashMap<i32, Tile>, laby: Vec<u16>) {
     for i in 0..laby.len() {
-        //let tile = tiles.get(&(laby[i] as i32));
+        let row = i*16 / canvas_width as usize * 16;
+        let col = i*16 % canvas_width as usize;
         let tile = match tiles.get(&(laby[i] as i32)) {
             Some(tile) => tile,
             None => {
@@ -120,23 +121,23 @@ fn draw_tiles(canvas: &mut sdl2::render::Canvas<sdl2::video::Window>, canvas_wid
                 continue;
             },
         };
-        //println!("{}: 0x{:02x} {}", i, laby[i], laby[i]);
-        let mut pos = 0;
-        let row = i*16/canvas_width as usize;
-        //println!("row: {}", row);
-        //println!("Drawing tile {}", laby[i]);
-        for y in 0..16 {
-            for x in 0..16 {
-                let color = tile.pixels[pos];
-                let (r, g, b) = palette[color as usize];
-                //println!("draw: {} {}x{} {} {} {}", pos, x, y, r, g, b);
-                canvas.set_draw_color(Color::RGB(r, g, b));
-                canvas.fill_rect(Rect::new(((i*16+x) % canvas_width as usize) as i32, (row*16+y) as i32, 1, 1));
-                pos+=1;
-            }
-        }
+        draw_tile(canvas, palette, tile, col as i32, row as i32);
     }
     canvas.present();
+}
+
+fn draw_tile(canvas: &mut sdl2::render::Canvas<sdl2::video::Window>, palette: [(u8, u8, u8); 256], tile: &Tile, offset_x: i32, offset_y: i32) {
+    let mut pos = 0;
+    for y in 0..16 {
+        for x in 0..16 {
+            let color = tile.pixels[pos];
+            let (r, g, b) = palette[color as usize];
+            //println!("draw: {} {}x{} {} {} {}", pos, x, y, r, g, b);
+            canvas.set_draw_color(Color::RGB(r, g, b));
+            canvas.fill_rect(Rect::new(offset_x + x, offset_y + y, 1, 1));
+            pos+=1;
+        }
+    }
 }
 
 fn main() {
