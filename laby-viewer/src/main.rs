@@ -111,6 +111,33 @@ fn get_laby_from_file(file: String, initial_seek: u64) -> Vec<u16> {
     return laby;
 }
 
+fn map_laby(laby: Vec<u16>) -> Vec<u16> {
+    let mut mapped_laby: Vec<u16> = Vec::new();
+    let mut map = HashMap::new();
+    map.insert(140, 60);
+    map.insert(24, 15);
+    map.insert(901, 542);
+    map.insert(902, 543);
+    map.insert(903, 544);
+    map.insert(941 ,457);
+    map.insert(942 ,458);
+    map.insert(943 ,459);
+
+    for i in 0..laby.len() {
+        match map.get(&laby[i]) {
+            Some(value) => {
+                println!("Map value {} to {}", i, value);
+                mapped_laby.push(*value);
+            },
+            None => {
+                mapped_laby.push(laby[i]);
+            },
+        };
+    }
+
+    return mapped_laby;
+}
+
 fn draw_tiles(canvas: &mut sdl2::render::Canvas<sdl2::video::Window>, canvas_width: i32, canvas_height: i32, palette: [(u8, u8, u8); 256], tiles: HashMap<i32, Tile>, laby: Vec<u16>) {
     let tiles_per_row = canvas_width / 16;
     let tiles_per_col = 10;
@@ -125,7 +152,7 @@ fn draw_tiles(canvas: &mut sdl2::render::Canvas<sdl2::video::Window>, canvas_wid
 
     for col in (0..tiles_per_row).rev() {
         for row in 0..tiles_per_col {
-            println!("Draw row {} col {}", row, col);
+            //println!("Draw row {} col {}", row, col);
             let tile = match tiles.get(&(laby[i] as i32)) {
                 Some(tile) => tile,
                 None => {
@@ -438,7 +465,7 @@ fn main() {
         (255, 0, 0),
     ];
 
-    let mapped_laby = get_laby_from_file(laby_file.to_string(), 0);
+    let mapped_laby = map_laby(get_laby_from_file(laby_file.to_string(), 0));
 
     draw_tiles(&mut canvas, canvas_width, canvas_height, palette, tiles, mapped_laby);
 
@@ -454,7 +481,7 @@ fn main() {
                     let row = y / 16;
                     let laby_tile = (col*10 + row) as usize;
                     println!("col {} row {}", col, row);
-                    println!("laby[{}]: {:04x}", laby_tile, original_laby[laby_tile]);
+                    println!("laby[{}]: 0x{:02x} / {}", laby_tile, original_laby[laby_tile], original_laby[laby_tile]);
                 }
                 /*
                 Event::KeyDown { keycode: Some(Keycode::Down), ..} => {
