@@ -143,8 +143,23 @@ Beschreibung 2.5:
 - Rechtsabbiegen
 - Ampel
 
+## Tile-Addressierung
 
+### Achtung (Fahrrad)
 
+In LABY file: 01ad hex = 173 dec
+
++32?
+
+In DAT file: cd00 hex = 205 dec
+
+### Einbahnstraße
+
+In LABY file: 01b3 hex = 179 dec
+
++32?
+
+In DAT file: d300 hex = 211 dec
 
 ## Mögliche Addressen in DIG-LABY.40
 

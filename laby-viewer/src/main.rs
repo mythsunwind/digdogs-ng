@@ -11,6 +11,7 @@ use std::collections::HashMap;
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
+use sdl2::mouse::MouseButton;
 use sdl2::pixels::{Color, PixelFormatEnum};
 use sdl2::rect::Rect;
 
@@ -100,7 +101,7 @@ fn get_laby_from_file(file: String, initial_seek: u64) -> Vec<u16> {
                     } else if(buffer[1] == 3) {
                         laby.push((buffer[0] as u16) + 768);
                     } else {
-                        laby.push(19999);
+                        laby.push(65535);
                     }
                 }
             },
@@ -115,7 +116,7 @@ fn draw_tiles(canvas: &mut sdl2::render::Canvas<sdl2::video::Window>, canvas_wid
     let tiles_per_col = 10;
     let mut i = 0;
     let mut pixels: Vec<u8> = Vec::new();
-    for i in 0..16*16 {
+    for _x in 0..16*16 {
         pixels.push(255);
     }
     let blank_tile = Tile {
@@ -437,21 +438,26 @@ fn main() {
         (255, 0, 0),
     ];
 
-    let laby = get_laby_from_file(laby_file.to_string(), 0);
+    let mapped_laby = get_laby_from_file(laby_file.to_string(), 0);
 
-    draw_tiles(&mut canvas, canvas_width, canvas_height, palette, tiles, laby);
+    draw_tiles(&mut canvas, canvas_width, canvas_height, palette, tiles, mapped_laby);
 
-    let mut pos = 0;
+    let original_laby = get_laby_from_file(laby_file.to_string(), 0);
+
     'mainloop: loop {
         for event in sdl_context.event_pump().unwrap().poll_iter() {
             match event {
                 Event::KeyDown { keycode: Some(Keycode::Escape), .. } |
                 Event::Quit { .. } => break 'mainloop,
+                Event::MouseButtonDown { x, y, mouse_btn: MouseButton::Left, .. } => {
+                    let col = (canvas_width - x) / 16;
+                    let row = y / 16;
+                    let laby_tile = (col*10 + row) as usize;
+                    println!("col {} row {}", col, row);
+                    println!("laby[{}]: {:04x}", laby_tile, original_laby[laby_tile]);
+                }
                 /*
                 Event::KeyDown { keycode: Some(Keycode::Down), ..} => {
-                    let pixels = get_pixels_from_file(file.to_string(), initial_seek + (pos * 600), amount);
-                    draw_pixels(&mut canvas, pixels, sprite_size, canvas_width, canvas_height);
-                    pos+=1;
                 },
                 */
                 _ => {}
